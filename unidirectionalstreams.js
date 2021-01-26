@@ -21,13 +21,13 @@ if (!('unidirectionalStreams' in WebTransport.prototype)) {
   Object.defineProperty(WebTransport.prototype, 'unidirectionalStreams', {
     get() {
       const transport = this;
-      if (!this.unidirectionalStreams) {
-        this.unidirectionalStreams = Object.freeze({
+      if (!this._unidirectionalStreams) {
+        this._unidirectionalStreams = Object.freeze({
           readable: transport.incomingUnidirectionalStreams,
           writable: transport.outgoingUnidirectionalStreams
         });
       }
-      return this._outgoingUnidirectionalStreams;
+      return this._unidirectionalStreams;
     }
   });
 }
