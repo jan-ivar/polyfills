@@ -1,5 +1,13 @@
 WebTransport = WebTransport || QuicTransport;
 
+if (!('maxDatagramSize' in WebTransport.prototype)) {
+  Object.defineProperty(WebTransport.prototype, 'maxDatagramSize', {
+    get() {
+      return 1320;
+    }
+  });
+}
+
 if (!('datagrams' in WebTransport.prototype)) {
   Object.defineProperty(WebTransport.prototype, 'datagrams', {
     get() {
