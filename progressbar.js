@@ -1,4 +1,4 @@
-function progressBar(file) {
+function makeProgressBar(file) {
   const canvas = document.createElement("canvas");
   canvas.width = window.innerWidth - 20;
   canvas.height = 16;
@@ -15,4 +15,3 @@ function progressBar(file) {
     }
   };
 }
-
