@@ -15,3 +15,4 @@ function progressBar(file) {
     }
   };
 }
+
