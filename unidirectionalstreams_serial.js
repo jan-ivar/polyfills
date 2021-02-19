@@ -8,7 +8,7 @@ if (!('outgoingUnidirectionalStreams' in WebTransport.prototype)) {
         this._outgoingUnidirectionalStreams = new WritableStream({
           async write(stream) {
             const {writable} = await transport.createUnidirectionalStream();
-            stream.pipeTo(writable).catch(() => {});
+            await stream.pipeTo(writable);
           }
         });
       }

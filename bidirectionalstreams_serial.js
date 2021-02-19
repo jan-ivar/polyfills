@@ -8,8 +8,8 @@ if (!('outgoingBidirectionalStreams' in WebTransport.prototype)) {
         this._outgoingBidirectionalStreams = new WritableStream({
           async write(stream) {
             const {writable, readable} = await transport.createBidirectionalStream();
-            stream.readable.pipeTo(writable).catch(() => {});
-            readable.pipeTo(stream.writable).catch(() => {});
+            await stream.readable.pipeTo(writable);
+            await readable.pipeTo(stream.writable);
           }
         });
       }
