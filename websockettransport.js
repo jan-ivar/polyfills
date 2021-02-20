@@ -31,6 +31,7 @@ class WebSocketTransport extends EventTarget {
         for await (const stream of wt.unidirectionalStreams.readable) {
           const chunks = [];
           for await (const chunk of stream.readable) chunks.push(chunk);
+
           // Here we'd detect incoming TEXT or DATA headers from a real server.
           // Alas, the "webrtc.internaut.com:6161/counter" test server this
           // polyfill is designed to work with ATM only returns byte counts...
