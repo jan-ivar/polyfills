@@ -1,7 +1,8 @@
 // This proof-of-concept WebSocket-like wrapper around WebTransport translates
 // the familiar WS-api into a stream-per-message model w/TEXT or DATA headers.
 //
-// It does not use message framing into a single stream, which is another way.
+// It does not do message framing into a single stream, which is another way.
+// Message order is not guaranteed.
 //
 // The WS-api is a poor fit for modern streaming (no back pressure or streams),
 // so this is meant as a transitional learning tool to using streams directly.
