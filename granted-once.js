@@ -1,12 +1,22 @@
 async function shimGrantedOnce(name) {
   try {
     const status = await window.navigator.permissions.query({name});
+    const lastState = status.state;
     status.onchange = () => {
-      if (status.state == "granted") {
-        window.localStorage[`queryShim_${name}_grantedOnce`] = true;
-      } else if (status.state == "denied") {
-        delete window.localStorage[`queryShim_${name}_grantedOnce`];
+      switch (status.state) {
+        case "granted":
+          window.localStorage[`queryShim_${name}_grantedOnce`] = true;
+          break;
+        case "denied":
+          delete window.localStorage[`queryShim_${name}_grantedOnce`];
+          break;
+        case "prompt":
+          if (lastState == "granted") {
+            delete window.localStorage[`queryShim_${name}_grantedOnce`];
+          }
+          break;
       }
+      lastState = status.state;
     };
     status.onchange();
   } catch (e) {}
