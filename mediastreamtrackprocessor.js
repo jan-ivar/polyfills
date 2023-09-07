@@ -3,7 +3,10 @@ if (!window.MediaStreamTrackProcessor) {
     constructor({track}) {
       const video = document.createElement("video");
       video.srcObject = new MediaStream([track]);
-      const loaded = new Promise(r => video.onloadedmetadata = r);
+      const loaded = Promise.all([
+        video.play(),
+        new Promise(r => video.onloadedmetadata = r)
+      ]);
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext('2d', {desynchronized: true});
 
@@ -29,4 +32,3 @@ if (!window.MediaStreamTrackProcessor) {
     }
   };
 }
-
