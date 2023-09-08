@@ -7,18 +7,16 @@ if (!window.MediaStreamTrackProcessor) {
         video.play(),
         new Promise(r => video.onloadedmetadata = r)
       ]);
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext('2d', {desynchronized: true});
 
       this.track = track;
-      let interval = 1000 / track.getSettings().frameRate;
-      let t1 = performance.now();
+      const interval = 1000 / track.getSettings().frameRate;
+      let canvas, ctx, t1 = performance.now();
 
       this.readable = new ReadableStream({
         async start(controller) {
           await loaded;
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+          canvas = new OffscreenCanvas(video.videoWidth, video.videoHeight);
+          ctx = canvas.getContext('2d', {desynchronized: true});
         },
         async pull(controller) {
           while (performance.now() - t1 < interval) {
