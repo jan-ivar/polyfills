@@ -1,5 +1,5 @@
-if (!window.MediaStreamTrackProcessor) {
-  window.MediaStreamTrackProcessor = class MediaStreamTrackProcessor {
+if (!self.MediaStreamTrackProcessor) {
+  self.MediaStreamTrackProcessor = class MediaStreamTrackProcessor {
     constructor({track}) {
       const video = document.createElement("video");
       video.srcObject = new MediaStream([track]);
