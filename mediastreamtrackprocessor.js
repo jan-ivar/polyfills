@@ -9,7 +9,7 @@ if (!self.MediaStreamTrackProcessor) {
         async start(controller) {
           await loaded;
           this.canvas = new OffscreenCanvas(video.videoWidth, video.videoHeight);
-          this.ctx = canvas.getContext('2d', {desynchronized: true});
+          this.ctx = this.canvas.getContext('2d', {desynchronized: true});
           this.t1 = performance.now();
         },
         async pull(controller) {
@@ -17,8 +17,8 @@ if (!self.MediaStreamTrackProcessor) {
             await new Promise(r => requestAnimationFrame(r));
           }
           this.t1 = performance.now();
-          ctx.drawImage(video, 0, 0);
-          controller.enqueue(new VideoFrame(canvas, {timestamp: this.t1}));
+          this.ctx.drawImage(video, 0, 0);
+          controller.enqueue(new VideoFrame(this.canvas, {timestamp: this.t1}));
         }
       });
     }
