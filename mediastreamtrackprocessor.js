@@ -1,9 +1,7 @@
 function worklet() {
   registerProcessor('MstpShim', class Processor extends AudioWorkletProcessor {
-      constructor() { super(); }
       process(input) { this.port.postMessage(input); return true; }
-    }
-  );
+  });
 }
 
 if (!self.MediaStreamTrackProcessor) {
@@ -41,20 +39,19 @@ if (!self.MediaStreamTrackProcessor) {
           },
           async pull(controller) {
             while (!this.buffered.length) await new Promise(r => this.node.port.onmessage = r);
-            const data = this.buffered.shift();
-            const joined = new Float32Array(data[0].reduce((a, b) => a + b.length, 0));
-            data[0].reduce((o, a) => (joined.set(a, o), o + a.length), 0);
-
+            const [channels] = this.buffered.shift();
+            const joined = new Float32Array(channels.reduce((a, b) => a + b.length, 0));
+            channels.reduce((offset, a) => (joined.set(a, offset), offset + a.length), 0);
             controller.enqueue(new AudioData({
               format: "f32-planar",
               sampleRate: this.ac.sampleRate,
-              numberOfFrames: data[0][0].length,
-              numberOfChannels:  data[0].length,
+              numberOfFrames: channels[0].length,
+              numberOfChannels:  channels.length,
               timestamp: this.ac.currentTime * 1e6 | 0,
               data: joined,
-              //transfer [audio[0]]
+              transfer: [joined]
             }));
-         }
+          }
         });
       }
     }
