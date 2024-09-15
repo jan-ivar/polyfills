@@ -47,8 +47,7 @@ if (!self.MediaStreamTrackProcessor) {
               numberOfFrames: channels[0].length,
               numberOfChannels:  channels.length,
               timestamp: this.ac.currentTime * 1e6 | 0,
-              data: joined,
-              transfer: [joined]
+              data: joined
             }));
           }
         });
