@@ -37,7 +37,7 @@ if (!self.MediaStreamTrackProcessor) {
             await this.ac.audioWorklet.addModule(`data:text/javascript,(${worklet.toString()})()`);
             this.node = new AudioWorkletNode(this.ac, 'MstpShim');
             this.ac.createMediaStreamSource(new MediaStream([track])).connect(this.node);
-            this.node.port.addEventListener("message", ({data}) => data[0][0]) && this.buffered.push(data));
+            this.node.port.addEventListener("message", ({data}) => data[0][0] && this.buffered.push(data));
           },
           async pull(controller) {
             while (!this.buffered.length) await new Promise(r => this.node.port.onmessage = r);
