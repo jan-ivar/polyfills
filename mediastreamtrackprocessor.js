@@ -1,9 +1,3 @@
-function worklet() {
-  registerProcessor('MstpShim', class Processor extends AudioWorkletProcessor {
-      process(input) { this.port.postMessage(input); return true; }
-  });
-}
-
 if (!self.MediaStreamTrackProcessor) {
   self.MediaStreamTrackProcessor = class MediaStreamTrackProcessor {
     constructor({track}) {
@@ -32,8 +26,13 @@ if (!self.MediaStreamTrackProcessor) {
           async start(controller) {
             this.ac = new AudioContext;
             this.buffered = [];
+            function worklet() {
+              registerProcessor("mstp-shim", class Processor extends AudioWorkletProcessor {
+                  process(input) { this.port.postMessage(input); return true; }
+              });
+            }
             await this.ac.audioWorklet.addModule(`data:text/javascript,(${worklet.toString()})()`);
-            this.node = new AudioWorkletNode(this.ac, 'MstpShim');
+            this.node = new AudioWorkletNode(this.ac, "mstp-shim");
             this.ac.createMediaStreamSource(new MediaStream([track])).connect(this.node);
             this.node.port.addEventListener("message", ({data}) => data[0][0] && this.buffered.push(data));
           },
