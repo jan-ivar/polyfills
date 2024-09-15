@@ -12,11 +12,11 @@ if (!self.MediaStreamTrackProcessor) {
       if (track.kind == "video") {
         this.readable = new ReadableStream({
           async start(controller) {
-            const video = document.createElement("video");
-            video.srcObject = new MediaStream([track]);
-            await Promise.all([video.play(), new Promise(r => video.onloadedmetadata = r)]);
+            this.video = document.createElement("video");
+            this.video.srcObject = new MediaStream([track]);
+            await Promise.all([this.video.play(), new Promise(r => this.video.onloadedmetadata = r)]);
             this.track = track;
-            this.canvas = new OffscreenCanvas(video.videoWidth, video.videoHeight);
+            this.canvas = new OffscreenCanvas(this.video.videoWidth, this.video.videoHeight);
             this.ctx = this.canvas.getContext('2d', {desynchronized: true});
             this.t1 = performance.now();
           },
@@ -25,7 +25,7 @@ if (!self.MediaStreamTrackProcessor) {
               await new Promise(r => requestAnimationFrame(r));
             }
             this.t1 = performance.now();
-            this.ctx.drawImage(video, 0, 0);
+            this.ctx.drawImage(this.video, 0, 0);
             controller.enqueue(new VideoFrame(this.canvas, {timestamp: this.t1}));
           }
         });
