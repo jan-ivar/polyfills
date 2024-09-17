@@ -1,6 +1,6 @@
 if (!window.MediaStreamTrackGenerator) {
   window.MediaStreamTrackGenerator = class MediaStreamTrackGenerator {
-    constructor(kind) {
+    constructor({kind}) {
       if (kind == "video") {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext('2d', {desynchronized: true});
@@ -13,7 +13,7 @@ if (!window.MediaStreamTrackGenerator) {
             frame.close();
           }
         });
-        return this.track;
+        return track;
       } else if (kind == "audio") {
         const ac = new AudioContext;
         const generator = this;
