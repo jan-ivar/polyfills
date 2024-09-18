@@ -48,9 +48,9 @@ if (!window.MediaStreamTrackGenerator) {
             return track;
           },
           write(audioData) {
-            const buffer = new Float32Array(audioData.numberOfFrames);
+            const buffer = new Float32Array(audioData.numberOfFrames * audioData.numberOfChannels);
             audioData.copyTo(buffer, {planeIndex: 0});
-            this.node.port.postMessage(buffer);
+            this.node.port.postMessage(buffer, [buffer]);
             audioData.close();
           }
         });
