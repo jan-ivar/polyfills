@@ -28,11 +28,12 @@ if (!window.MediaStreamTrackGenerator) {
                   this.buffers = [];
                   this.bufferOffset = 0;
                   this.port.onmessage = ({data}) => this.buffers.push(data);
+                  this.emptyBuffer = new Float32Array(0);
                 }
                 process(inputs, [[output]]) {
                   for (let i = 0; i < output.length; i++) {
                     if (!this.buffer || this.bufferOffset >= this.buffer.length) {
-                      this.buffer = this.buffers.shift() || new Float32Array(0);
+                      this.buffer = this.buffers.shift() || this.emptyBuffer;
                       this.bufferOffset = 0;
                     }
                     output[i] = this.buffer[this.bufferOffset++] || 0;
