@@ -17,17 +17,29 @@ if (!window.MediaStreamTrackGenerator) {
       } else if (kind == "audio") {
         const ac = new AudioContext;
         const generator = this;
-        const dest = createMediaStreamDestination();
+        const dest = ac.createMediaStreamDestination();
         this.track = dest.stream.getAudioTracks()[0];
         this.writable = new WritableStream({
           async start(controller) {
             this.buffered = [];
             function worklet() {
               registerProcessor("mstg-shim", class Processor extends AudioWorkletProcessor {
-                  process(input, output) {
-                    this.port.postMessage(input);
-                    return true;
+                constructor() {
+                  super();
+                  this.buffers = [];
+                  this.bufferOffset = 0;
+                  this.port.onmessage = ({data}) => this.buffers.push(data);
+                }
+                process(inputs, [[output]]) {
+                  for (let i = 0; i < output.length; i++) {
+                    if (!this.buffer || this.bufferOffset >= this.buffer.length) {
+                      this.buffer = this.buffers.shift() || new Float32Array(0);
+                      this.bufferOffset = 0;
+                    }
+                    output[i] = this.currentBuffer[this.bufferOffset++] || 0;
                   }
+                  return true;
+                }
               });
             }
             await ac.audioWorklet.addModule(`data:text/javascript,(${worklet.toString()})()`);
@@ -35,8 +47,9 @@ if (!window.MediaStreamTrackGenerator) {
             this.node.connect(dest);
           },
           write: audioData => {
-            this.node.port.postMessage("message", ({data}) => data[0][0] && this.buffered.push(data));
-            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+            const buffer = new Float32Array(audioData.numberOfFrames);
+            audioData.copyTo(buffer);
+            this.node.port.postMessage(buffer);
             audioData.close();
           },
         });
