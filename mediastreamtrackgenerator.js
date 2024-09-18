@@ -20,23 +20,23 @@ if (!window.MediaStreamTrackGenerator) {
         const [track] = dest.stream.getAudioTracks();
         track.writable = new WritableStream({
           async start(controller) {
-            this.buffered = [];
+            this.arrays = [];
             function worklet() {
               registerProcessor("mstg-shim", class Processor extends AudioWorkletProcessor {
                 constructor() {
                   super();
-                  this.buffers = [];
-                  this.bufferOffset = 0;
-                  this.port.onmessage = ({data}) => this.buffers.push(data);
-                  this.emptyBuffer = new Float32Array(0);
+                  this.arrays = [];
+                  this.arrayOffset = 0;
+                  this.port.onmessage = ({data}) => this.arrays.push(data);
+                  this.emptyArray = new Float32Array(0);
                 }
                 process(inputs, [[output]]) {
                   for (let i = 0; i < output.length; i++) {
-                    if (!this.buffer || this.bufferOffset >= this.buffer.length) {
-                      this.buffer = this.buffers.shift() || this.emptyBuffer;
-                      this.bufferOffset = 0;
+                    if (!this.array || this.arrayOffset >= this.array.length) {
+                      this.array = this.arrays.shift() || this.emptyArray;
+                      this.arrayOffset = 0;
                     }
-                    output[i] = this.buffer[this.bufferOffset++] || 0;
+                    output[i] = this.array[this.arrayOffset++] || 0;
                   }
                   return true;
                 }
@@ -48,9 +48,9 @@ if (!window.MediaStreamTrackGenerator) {
             return track;
           },
           write(audioData) {
-            const buffer = new Float32Array(audioData.numberOfFrames * audioData.numberOfChannels);
-            audioData.copyTo(buffer, {planeIndex: 0});
-            this.node.port.postMessage(buffer, [buffer]);
+            const array = new Float32Array(audioData.numberOfFrames * audioData.numberOfChannels);
+            audioData.copyTo(array, {planeIndex: 0});
+            this.node.port.postMessage(array, [array.buffer]);
             audioData.close();
           }
         });
