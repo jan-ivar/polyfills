@@ -18,7 +18,7 @@ if (!self.MediaStreamTrackProcessor) {
             }
             this.t1 = performance.now();
             this.ctx.drawImage(this.video, 0, 0);
-            controller.enqueue(new VideoFrame(this.canvas, {timestamp: this.t1}));
+            controller.enqueue(new VideoFrame(this.canvas, {timestamp: this.t1 * 1000}));
           }
         });
       } else if (track.kind == "audio") {
