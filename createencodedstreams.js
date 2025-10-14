@@ -13,7 +13,7 @@ if (!window.RTCRtpSender.prototype.createEncodedStreams) {
   window.RTCRtpReceiver.prototype.createEncodedStreams = function createEncodedStreams() {
     function work() {
       const originals = [];
-      onrtctransform = async ({transformer: {readable, writable, options}}) => {
+      onrtctransform = async ({transformer: {readable, writable}}) => {
         const diverter = new TransformStream({transform: (original, controller) => {
           originals.push(original);
           controller.enqueue(original);
