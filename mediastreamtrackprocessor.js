@@ -4,6 +4,7 @@ if (!self.MediaStreamTrackProcessor) {
       if (track.kind == "video") {
         this.readable = new ReadableStream({
           async start(controller) {
+            track.addEventListener("ended", () => controller.close(), {once: true});
             this.video = document.createElement("video");
             this.video.srcObject = new MediaStream([track]);
             await Promise.all([this.video.play(), new Promise(r => this.video.onloadedmetadata = r)]);
@@ -13,8 +14,11 @@ if (!self.MediaStreamTrackProcessor) {
             this.t1 = performance.now();
           },
           async pull(controller) {
-            while (performance.now() - this.t1 < 1000 / track.getSettings().frameRate) {
+            if (track.readyState == "ended") return controller.close();
+            const fps = track.getSettings().frameRate || 30;
+            while (performance.now() - this.t1 < 1000 / fps) {
               await new Promise(r => requestAnimationFrame(r));
+              if (track.readyState == "ended") return controller.close();
             }
             this.t1 = performance.now();
             this.ctx.drawImage(this.video, 0, 0);
