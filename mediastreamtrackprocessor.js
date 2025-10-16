@@ -28,6 +28,7 @@ if (!self.MediaStreamTrackProcessor) {
       } else if (track.kind == "audio") {
         this.readable = new ReadableStream({
           async start(controller) {
+            track.addEventListener("ended", () => controller.close(), {once: true});
             this.ac = new AudioContext;
             this.arrays = [];
             function worklet() {
@@ -41,7 +42,11 @@ if (!self.MediaStreamTrackProcessor) {
             this.node.port.addEventListener("message", ({data}) => data[0][0] && this.arrays.push(data));
           },
           async pull(controller) {
-            while (!this.arrays.length) await new Promise(r => this.node.port.onmessage = r);
+            if (track.readyState == "ended") return controller.close();
+            while (!this.arrays.length) {
+              await new Promise(r => this.node.port.onmessage = r);
+              if (track.readyState == "ended") return controller.close();
+            }
             const [channels] = this.arrays.shift();
             const joined = new Float32Array(channels.reduce((a, b) => a + b.length, 0));
             channels.reduce((offset, a) => (joined.set(a, offset), offset + a.length), 0);
