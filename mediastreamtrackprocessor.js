@@ -20,6 +20,8 @@ if (!self.MediaStreamTrackProcessor) {
               await new Promise(r => requestAnimationFrame(r));
               if (track.readyState == "ended") return controller.close();
             }
+            this.canvas.width = this.video.videoWidth;
+            this.canvas.height = this.video.videoHeight;
             this.t1 = performance.now();
             this.ctx.drawImage(this.video, 0, 0);
             controller.enqueue(new VideoFrame(this.canvas, {timestamp: this.t1}));
